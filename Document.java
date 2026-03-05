@@ -2,18 +2,14 @@ package document;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Document {
 
 	private String text;
-	
-	// Cache for compiled patterns to avoid redundant compilation
-	private static Map<String, Pattern> patternCache = new HashMap<String, Pattern>();
+	private String lowerCaseText;
 	
 	/** Create a new document from the given text.
 	 * Because this class is abstract, this is used only from subclasses.
@@ -24,6 +20,12 @@ public abstract class Document {
 		this.text = text;
 	}
 	
+	private String getLowerCaseText() {
+		if (lowerCaseText == null) {
+			lowerCaseText = text.toLowerCase();
+		}
+		return lowerCaseText;
+	}
 	
 	/** Returns the tokens that match the regex pattern from the document 
 	 * text string.
@@ -35,12 +37,8 @@ public abstract class Document {
 	protected List<String> getTokens(String pattern)
 	{   
 		ArrayList<String> tokens = new ArrayList<String>();
-		Pattern tokSplitter = patternCache.get(pattern);
-		if (tokSplitter == null) {
-			tokSplitter = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-			patternCache.put(pattern, tokSplitter);
-		}
-		Matcher m = tokSplitter.matcher(getText());
+		Pattern tokSplitter = Pattern.compile(pattern);
+		Matcher m = tokSplitter.matcher(getLowerCaseText());
 		
 		while (m.find()) {
 			tokens.add(m.group());
@@ -60,19 +58,18 @@ public abstract class Document {
 		int numSyllables = 0;
 		boolean newSyllable = true;
 		String vowels = "aeiouy";
-		int len = word.length();
-		for (int i = 0; i < len; i++)
+		char[] cArray = word.toLowerCase().toCharArray();
+		for (int i = 0; i < cArray.length; i++)
 		{
-			char c = Character.toLowerCase(word.charAt(i));
-		    if (i == len-1 && c == 'e' 
+		    if (i == cArray.length-1 && cArray[i] == 'e' 
 		    		&& newSyllable && numSyllables > 0) {
                 numSyllables--;
             }
-		    if (newSyllable && vowels.indexOf(c) >= 0) {
+		    if (newSyllable && vowels.indexOf(cArray[i]) >= 0) {
 				newSyllable = false;
 				numSyllables++;
 			}
-			else if (vowels.indexOf(c) < 0) {
+			else if (vowels.indexOf(cArray[i]) < 0) {
 				newSyllable = true;
 			}
 		}

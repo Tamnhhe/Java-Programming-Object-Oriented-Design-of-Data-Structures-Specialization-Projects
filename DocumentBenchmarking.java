@@ -19,8 +19,8 @@ public class DocumentBenchmarking {
 	    // You can try playing around with this number.
 	    int trials = 10;
 	    String textfile = "data/warAndPeace.txt";
-		int increment = 5000;
-		int numSteps = 10;
+		int increment = 40000;
+		int numSteps = 50;
 		int start = 50000;
 		
 		// TODO: Fill in the rest of this method so that it runs two loops
@@ -66,13 +66,11 @@ public class DocumentBenchmarking {
 			FileInputStream inputFile= new FileInputStream(filename);
 			InputStreamReader inputStream = new InputStreamReader(inputFile);
 			BufferedReader bis = new BufferedReader(inputStream);
-			char[] buf = new char[1024];
-			int read;
-			int totalRead = 0;
-			while ((read = bis.read(buf)) != -1 && totalRead < numChars) {
-				int toAppend = Math.min(read, numChars - totalRead);
-				s.append(buf, 0, toAppend);
-				totalRead += toAppend;
+			int val;
+			int count = 0;
+			while ((val = bis.read()) != -1 && count < numChars) {
+				s.append((char)val);
+				count++;
 			}
 			bis.close();
 		}
@@ -80,6 +78,7 @@ public class DocumentBenchmarking {
 		{
 		  // Grader doesn't want abnormal termination
 		}
+		
 		
 		return s.toString();
 	}
